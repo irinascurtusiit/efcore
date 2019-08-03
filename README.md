@@ -380,18 +380,10 @@
   ```cs
       public void CreateCupcake(Cupcake cupcake)
       {
-         if (cupcake.PhotoAvatar != null && cupcake.PhotoAvatar.Length > 0)
-         {
-            cupcake.ImageMimeType = cupcake.PhotoAvatar.ContentType;
-            cupcake.ImageName = Path.GetFileName(cupcake.PhotoAvatar.FileName);
-            using (var memoryStream = new MemoryStream())
-            {
-                cupcake.PhotoAvatar.CopyTo(memoryStream);
-                cupcake.PhotoFile = memoryStream.ToArray();
-            }
+         
              _context.Add(cupcake);
             _context.SaveChanges();
-         }
+         
       }
 ```
 
@@ -458,29 +450,24 @@
 5. Place the cursor before the located code, press Enter, press the Up arrow key, type the following code, and then press Enter.
   ```cs
       private ICupcakeRepository _repository;
-      private IHostingEnvironment _environment;
-
-      public CupcakeController(ICupcakeRepository repository, IHostingEnvironment environment)
+    
+      public CupcakeController(ICupcakeRepository repository)
       {
-           _repository = repository;
-           _environment = environment;
+           _repository = repository;         
       }
 ```
 
 #### Task 3: Use Entity Framework Core to retrieve data
 
 1. In the **CupcakeController.cs** code block, in the **Index** action code block, select the following code:
-  ```cs
-       return View();
-```
-2. Replace the selected code with the following code:
-  ```cs
-       return View(_repository.GetCupcakes());
+ ```cs
+       return _repository.GetCupcakes();
 ```
 
 3. Ensure that the cursor is at the end of the **Index** action code block, press Enter two times, and then type the following code:
   ```cs
-       public IActionResult Details(int id)
+  [HTTPGet]
+       public ActionResult<CupCake> Details(int id)
        {
        }
 ```
@@ -491,42 +478,18 @@
        {
            return NotFound();
        }
-       return View(cupcake);
+       return cupcake;
 ```
 
 
 #### Task 4: Manipulate data by using Entity Framework Core
 
-1. In the **CupcakeController.cs** code block, locate the following code:
-  ```cs
-       public IActionResult Details(int id)
-       {
-            var cupcake = _repository.GetCupcakeById(id);
-            if (cupcake == null)
-            {
-                return NotFound();
-            }
-            return View(cupcake);
-       }
-```
 
-2. Place the cursor at the end of the located code, press Enter,  type the following code, and then press Enter two times.
-  ```cs
-       [HttpGet]
-       public IActionResult Create()
-       {
-       }
-```
 
-3. In the **Create** action code block, type the following code:
-  ```cs
-       PopulateBakeriesDropDownList();
-       return View();
-```
 4. Ensure that the cursor is at the end of the **Create** action code block, press Enter two times, and then type the following code:
   ```cs
-       [HttpPost, ActionName("Create")]
-       public IActionResult CreatePost(Cupcake cupcake)
+       [HttpPost]
+       public ActionResult<CupCake> Create(Cupcake cupcake)
        {
        }
 ```
@@ -540,34 +503,14 @@
        }
       return View(cupcake);
 ```
-
-6. Ensure that the cursor is at the end of the **CreatePost** method code block, press Enter two times, and then type the following code:
+8. Ensure that the cursor is at the end of the **Create** action code block, press Enter two times, and then type the following code:
   ```cs
-       [HttpGet]
-       public IActionResult Edit(int id)
+       [HttpPut]
+       public ActionResult<CupCake> Update(int id, CupCake model)
        {
        }
 ```
-
-7. In the **Edit** action code block, type the following code:
-  ```cs
-       Cupcake cupcake = _repository.GetCupcakeById(id);
-       if (cupcake == null)
-       {
-            return NotFound();
-       }
-     
-       return View(cupcake);
-```
-
-8. Ensure that the cursor is at the end of the **Edit** action code block, press Enter two times, and then type the following code:
-  ```cs
-       [HttpPost, ActionName("Edit")]
-       public async Task<IActionResult> EditPost(int id)
-       {
-       }
-```
-9. In the **EditPost** method code block, type the following code:
+9. In the **Update** method code block, type the following code:
   ```cs
        var cupcakeToUpdate = _repository.GetCupcakeById(id);
        bool isUpdated = await TryUpdateModelAsync<Cupcake>(
@@ -583,7 +526,7 @@
             _repository.SaveChanges();
            
        }
-       PopulateBakeriesDropDownList(cupcakeToUpdate.BakeryId);
+      
        return cupcakeToUpdate;
 ```
 
